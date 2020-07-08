@@ -15,6 +15,10 @@ path = /handler
 ops = Login,NewProxy,NewWorkConn,NewUserConn
 ```
 最后重启frps服务`service frps restart`即可实现插件的安装配置
+## 修改配置
+用户可以更改`uwsgi_frp-info.ini`文件来配置uwsgi启动参数  
+更改`frp-info.service`来修改启动路径和配置文件路径  
+更改`config.py`来修改flask安全秘钥以及钉钉群机器人的安全秘钥和接口秘钥  
 ## 添加自启动
 修改`frp-info.service`文件的uwsgi路径和配置文件路径为本机的路径，修改用户为本机的用户名  
 ```conf

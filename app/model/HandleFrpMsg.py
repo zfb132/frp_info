@@ -4,6 +4,8 @@
 # time: 2020-07-08 19:55
 
 import logging
+import json
+from app.model.DingTalkBot import send_text
 
 logging = logging.getLogger('runserver.handlefrpmsg')
 
@@ -16,4 +18,5 @@ def handlemsg(data):
     if operation == 'Ping':
         return
     content = data['content']
+    send_text(json.dumps(content, ensure_ascii=False))
     logging.debug(content)
