@@ -1,0 +1,14 @@
+[Unit]
+Description=Frp-info service
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+Restart=on-failure
+RestartSec=5s
+WorkingDirectory=/home/ubuntu/frp-info
+ExecStart=/home/ubuntu/frp-info/venv/bin/uwsgi --ini /home/ubuntu/frp-info/uwsgi_frp-info.ini
+
+[Install]
+WantedBy=multi-user.target
