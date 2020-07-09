@@ -24,9 +24,13 @@ def handler():
         data = request.json
         # print(data)
         # 处理来自frp的请求数据
-        handlemsg(data)
-        # 始终返回此信息：不拒绝连接，保持不变；即不对内容进行任何操作
-        response_data = {"reject": False, "unchange": True}
+        is_allow_ssh = handlemsg(data)
+        if is_allow_ssh:
+            # 不拒绝连接，保持不变；即不对内容进行任何操作
+            response_data = {"reject": False, "unchange": True}
+        else:
+            # 拒绝连接，非法用户
+            response_data = {"reject": True, "reject_reason": "invalid user"}            
         return json.dumps(response_data, ensure_ascii=False), 200
     except Exception as e:
         logging.error(repr(e))

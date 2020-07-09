@@ -28,8 +28,6 @@ def get_params(secret):
     string_to_sign_enc = string_to_sign.encode('utf-8')
     hmac_code = hmac.new(secret_enc, string_to_sign_enc, digestmod=hashlib.sha256).digest()
     sign = urllib.parse.quote_plus(base64.b64encode(hmac_code))
-    print(timestamp)
-    print(sign)
     return timestamp, sign
 
 # 发送消息并@指定成员
