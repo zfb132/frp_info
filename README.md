@@ -28,7 +28,7 @@ frp-client建立穿透代理
 登录时间：2020-07-09 18:39:01
 用户IP和端口：202.103.44.150:63017
 用户位置：湖北省武汉市 电信
-允许用户连接：True
+允许用户连接：是
 ```
 若用户IP在拒绝名单，则返回`False`，被拒绝连接的用户在终端显示如下信息：  
 ```txt
@@ -126,3 +126,10 @@ ubuntu@VM-16-13-ubuntu:~/$ systemctl status frp-info.service
 Jul 08 23:35:43 VM-16-13-ubuntu uwsgi[5040]: [pid: 5059|app: 0|req: 3/13] 127.0.0.1 () {34 vars in ...
 ubuntu@VM-16-13-ubuntu:~/$
 ```
+## 常见问题
+1. 如何修改服务监听端口（默认为6666）？  
+修改`frps.ini`的`plugin.frp-info`部分的`addr`字段设置的端口；再修改`uwsgi_frp-info.ini`的`http`字段设置的端口，重新启动程序即可  
+2. 无法正常使用service管理？  
+查看`/etc/systemd/system/frp-info.service`文件是否存在；确保User字段设置为本机用户名（防止权限问题），WorkingDirectory和ExecStart的路径与本机的路径一致  
+3. 只想查看frp的连接信息，不需要ip过滤功能？  
+建议使用[frp-notify](https://github.com/arugal/frp-notify)。事实上，我最初也是用的此插件，想要添加过滤一些IP的功能，但是由于对Go语言不熟悉，所以就自己动手写了一个使用Python的插件
