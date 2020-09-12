@@ -28,16 +28,25 @@ def ip2geo(ip):
 def ip_check(ip):
     ip = ip_address(ip)
     if SSH_IP_MODE == 'allow':
+        # 允许的IP列表
+        allow_list = []
         # 如果允许名单为空，表示全部禁止
         if len(SSH_IP_ALLOW) == 0:
             return False
+        # 判断允许名单是文件还是列表
+        if not isinstance(SSH_IP_ALLOW, list):
+            with open(SSH_IP_ALLOW, "r") as file:
+                allow_list = file.read().splitlines()
+        else:
+            allow_list = SSH_IP_ALLOW
+        # 开始判断该IP是否在名单
         try:
-            ips = list(map(IPv4Network, SSH_IP_ALLOW))
+            ips = list(map(IPv4Network, allow_list))
         except Exception as e:
             # 可能会有子网掩码表示出错，则只保留单个ip
             print(repr(e))
             logging.error(e)
-            ips = [IPv4Network(x) for x in SSH_IP_ALLOW if '/' not in x]
+            ips = [IPv4Network(x) for x in allow_list if '/' not in x]
         # 判断IP是否在范围内
         for ip_range in ips:
             if ip in ip_range:
@@ -45,16 +54,25 @@ def ip_check(ip):
         else:
             return False
     elif SSH_IP_MODE == 'block':
+        # 禁止的IP列表
+        deny_list = []
         # 如果阻止名单为空，表示全部允许
         if len(SSH_IP_BLOCK) == 0:
             return True
+        # 判断禁止名单是文件还是列表
+        if not isinstance(SSH_IP_BLOCK, list):
+            with open(SSH_IP_BLOCK, "r") as file:
+                deny_list = file.read().splitlines()
+        else:
+            deny_list = SSH_IP_BLOCK
+        # 开始判断该IP是否在名单
         try:
-            ips = list(map(IPv4Network, SSH_IP_BLOCK))
+            ips = list(map(IPv4Network, deny_list))
         except Exception as e:
             # 可能会有子网掩码表示出错，则只保留单个ip
             print(repr(e))
             logging.error(e)
-            ips = [x for x in SSH_IP_BLOCK if '/' not in x]
+            ips = [x for x in deny_list if '/' not in x]
         # 判断IP是否在范围内
         for ip_range in ips:
             if ip in ip_range:
