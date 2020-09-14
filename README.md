@@ -73,9 +73,13 @@ path = /handler
 ops = Login,NewProxy,NewWorkConn,NewUserConn
 ```
 2. 修改`uwsgi_frp-info.ini`文件来配置uwsgi启动参数，保证http监听端口与步骤1设置一致
-3. 更改`config.py`来修改flask安全秘钥以及钉钉群机器人的安全秘钥和接口秘钥
+3. 更改`config.py`来修改flask安全秘钥以及钉钉群机器人的安全秘钥和接口秘钥和IP名单
 
-注意：`SSH_IP_ALLOW`如果设置为list，则无法在运行过程中自动载入新的ip；如果设置为文件名称，则可以实现动态的实时ip添加
+注意：`SSH_IP_ALLOW`如果设置为list，则无法在运行过程中自动载入新的ip；如果设置为文件名称，则可以实现动态的实时ip添加  
+只需要用户在本机使用GET访问链接（一般直接点击即可）  
+`http://12.34.56.78:6666/auth/fHfuglg_RpLHJBcXDZTYTDHG_ydyydYCYFCcxFFcgx_cJnbVBMjhDSweq_ryiutHG?token=wqfK3JQ7Re2JngWpqtd2C542890tewkvslGDJVifvjFfindPf6xmdCGwYoJejhKwPfqqo`  
+其中`12.34.56.78`是运行frps的主机IP，`6666`是本插件的监听端口，`token`的值是在`config.py`中配置的验证字符串`AUTH_STR`  
+为了减少被扫描的风险，最好自己修改`/auth/`后面的路径以及`AUTH_STR`的内容  
 ### 2.3 运行代码
 然后**在项目主目录下**输入以下命令测试启动uwsgi及插件frp-info：  
 `source venv/bin/activate && uwsgi --ini uwsgi_frp-info.ini -d /dev/null && deactivate`  
