@@ -132,7 +132,7 @@ Jul 08 23:35:43 VM-16-13-ubuntu uwsgi[5040]: [pid: 5059|app: 0|req: 3/13] 127.0.
 ubuntu@VM-16-13-ubuntu:~/$
 ```
 ## 常见问题
-1. 如何修改服务监听端口（默认为6666）？  
+1. 如何修改服务监听端口（默认为`6666`）？  
 修改`frps.ini`的`plugin.frp-info`部分的`addr`字段设置的端口；再修改`uwsgi_frp-info.ini`的`http`字段设置的端口，重新启动程序即可  
 2. 无法正常使用service管理？  
 查看`/etc/systemd/system/frp-info.service`文件是否存在；确保User字段设置为本机用户名（防止权限问题），WorkingDirectory和ExecStart的路径与本机的路径一致  
