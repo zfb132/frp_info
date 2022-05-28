@@ -37,7 +37,7 @@ kex_exchange_identification: Connection closed by remote host
 zfb@super-pc:~/$ 
 ```
 ## 1. frp服务端插件开发
-frp服务端插件的工作原理见[server_plugin_zh.md](https://github.com/fatedier/frp/blob/master/doc/server_plugin_zh.md)。简单来说就是我们创建的插件需要提供一个web服务，frp会在收到指定操作时把相关信息通过POST请求来发送给特定的url，而插件收到请求后可以根据内容来决定frp如何处理相关操作。若文件`frps.ini`添加以下内容  
+frp服务端插件的工作原理见[server_plugin.md](https://github.com/fatedier/frp/blob/dev/doc/server_plugin.md)。简单来说就是我们创建的插件需要提供一个web服务，frp会在收到指定操作时把相关信息通过POST请求来发送给特定的url，而插件收到请求后可以根据内容来决定frp如何处理相关操作。若文件`frps.ini`添加以下内容  
 ```conf
 [plugin.frp-info]
 addr = 127.0.0.1:6666
