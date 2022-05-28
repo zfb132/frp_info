@@ -7,7 +7,7 @@ from datetime import datetime
 import logging
 import time
 
-from app.config import SSH_IP_MODE
+from app.config import SSH_IP_MODE, subdomain_host
 from app.model.DingTalkBot import send_text
 from app.model.SSHFilter import ip_check, ip2geo
 
@@ -19,9 +19,9 @@ def timestamp_to_str(timestamp):
 
 # 处理Login操作：frpc登录frps
 def login_operation(data):
-    str_fmt = "frp-client登录\nfrp版本：{}\n主机ID：{}\n主机名：{}\n系统类型：{}\n系统架构：{}\n登录时间：{}\n连接池大小：{}"
+    str_fmt = "frp-client登录\nfrp版本：{}\n系统类型：{}\n系统架构：{}\n登录时间：{}\n连接池大小：{}"
     txt = str_fmt.format(
-        data['version'], data['run_id'], data['hostname'], data['os'],
+        data['version'], data['os'],
         data['arch'], timestamp_to_str(data['timestamp']), data['pool_count']
     )
     return txt
@@ -30,10 +30,14 @@ def login_operation(data):
 # proxy_name是frpc与frps之间建立的连接的名称
 def newproxy_operation(data):
     run_id = data['user']['run_id']
-    str_fmt = "frp-client建立穿透代理\n主机ID：{}\n代理名称：{}\n代理类型：{}\n远程端口：{}\n"
-    txt = str_fmt.format(
-        run_id, data['proxy_name'], data['proxy_type'], data['remote_port']
+    proxy_type = data['proxy_type']
+    txt = "frp-client建立穿透代理\n主机ID：{}\n代理名称：{}\n代理类型：{}\n".format(
+        run_id, data['proxy_name'], proxy_type
     )
+    if proxy_type in ["tcp", "udp"]:
+        txt += "远程端口：{}\n".format(data['remote_port'])
+    elif proxy_type in ["http", "https"]:
+        txt += "子域名：{}.{}\n".format(data['subdomain'], subdomain_host)
     return txt
 
 # 处理NewUserConn操作：用户连接内网机器；用户（ssh）-->云服务器（frps）-->内网主机（frpc）

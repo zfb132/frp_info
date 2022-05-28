@@ -12,6 +12,9 @@ DINGTALK_SECRET_KEY = "SECff11ffffffffffffffffffffffffffff896c5cb6d2123456789876
 # 钉钉群机器人的接入秘钥
 DINGTALK_ACCESS_TOKEN = "896c5cb6d212896c5cb6d212ac9d9dac896c5cb6d2120dd24896c5cb6d2128c4"
 
+# frps.ini，若未设置，则写为""即可
+subdomain_host = "example.cn"
+
 # no表示不过滤IP，允许所有的IP，此时忽略SSH_IP_BLOCK、SSH_IP_ALLOW
 # allow表示允许名单模式，只有SSH_IP_ALLOW允许访问，此时忽略SSH_IP_BLOCK
 # block表示禁止名单模式，只有SSH_IP_BLOCK禁止访问，此时忽略SSH_IP_ALLOW
