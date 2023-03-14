@@ -138,3 +138,36 @@ ubuntu@VM-16-13-ubuntu:~/$
 查看`/etc/systemd/system/frp-info.service`文件是否存在；确保User字段设置为本机用户名（防止权限问题），WorkingDirectory和ExecStart的路径与本机的路径一致  
 3. 只想查看frp的连接信息，不需要ip过滤功能？  
 建议使用[frp-notify](https://github.com/arugal/frp-notify)。事实上，我最初也是用的此插件，想要添加过滤一些IP的功能，但是由于对Go语言不熟悉，所以就自己动手写了一个使用Python的插件
+
+
+# docker 使用方式及注意事项
+1. docker使用时如果需要修改`uwsgi_frp-info.ini`文件可以设置映射如下  
+一定要记得修改里面的`home = ./venv`为：`#home = ./venv`，否则无法运行
+```
+docker run -dit --name frp --restart always -v you-path/uwsgi_frp-info.ini:/frp/uwsgi_frp-info.ini
+```
+
+需要修改什么文件就可以添加映射，容器内的`/frp`目录即为项目的根目录  
+下面是容器内项目结构  
+/frp  
+├── allow.txt  
+├── app  
+│   ├── config.py  
+│   ├── controller  
+│   │   ├── __init__.py  
+│   │   └── main.py  
+│   ├── __init__.py  
+│   └── model  
+│       ├── DingTalkBot.py  
+│       ├── HandleFrpMsg.py  
+│       ├── __init__.py  
+│       └── SSHFilter.py  
+├── Dockerfile  
+├── frp-info.service  
+├── LICENSE  
+├── log.py  
+├── README.md  
+├── requirements.txt  
+├── restart.sh  
+├── runserver.py  
+└── uwsgi_frp-info.ini  
