@@ -53,18 +53,6 @@ ops = Login,NewProxy,NewWorkConn,NewUserConn
 
 示例中的**监听端口、路由名称、操作类型**均可以自定义，开发插件也可以使用任何喜欢的编程语言，由于本人对Go语言不甚熟悉，所以采用python编写代码
 ## 2. frp-info插件使用说明
-### 2.1 创建虚拟环境
-插件基于python3编写，搭建flask服务（运行在虚拟环境），在当前项目主目录下创建虚拟环境并安装库：  
-```bash
-#! /bin/bash
-# 自动安装venv管理虚拟环境
-sudo apt-get install python3-venv -y
-# 创建虚拟环境venv
-python3 -m venv venv
-# 激活虚拟环境并安装库
-source venv/bin/activate && pip install  -r requirements.txt && deactivate
-```
-### 2.2 修改配置文件
 1. 修改`frps.ini`文件,添加以下内容  
 ```conf
 [plugin.frp-info]
@@ -80,12 +68,84 @@ ops = Login,NewProxy,NewWorkConn,NewUserConn
 `http://12.34.56.78:6666/auth/fHfuglg_RpLHJBcXDZTYTDHG_ydyydYCYFCcxFFcgx_cJnbVBMjhDSweq_ryiutHG?token=wqfK3JQ7Re2JngWpqtd2C542890tewkvslGDJVifvjFfindPf6xmdCGwYoJejhKwPfqqo`  
 其中`12.34.56.78`是运行frps的主机IP，`6666`是本插件的监听端口，`token`的值是在`config.py`中配置的验证字符串`AUTH_STR`  
 为了减少被扫描的风险，最好自己修改`/auth/`后面的路径以及`AUTH_STR`的内容  
-### 2.3 运行代码
+## 3. 使用docker运行
+### 3.1 不使用uwsgi
+docker 使用方式及注意事项  
+* 插件默认监听容器的`6666`端口（需要与宿主机的`frps.ini`设置的插件端口匹配，可以使用`-p`映射到宿主机的任意端口）
+* 修改并配置自己的[config.py](https://github.com/zfb132/frp_info/blob/master/app/config.py)文件，可以使用`-v`映射到容器的`/frp/app/config.py`文件
+* 注意`config.py`中的文件路径是容器内的路径，不是宿主机的路径
+
+docker使用示例  
+```bash
+# -u 指定用户和组，否则容器内的文件权限可能有问题
+# -v 映射目录 -p 映射端口
+# 注意设置 config.py 的 SSH_IP_ALLOW="/frp/allow.txt"
+docker run -itd --restart always --name frp_info whuzfb/frp_info:latest \
+ -u $(id -u):$(id -g) \
+ -v path/to/config.py:/frp/app/config.py \
+ -v path/to/allow.txt:/frp/allow.txt \
+ -p 15666:6666 \
+```
+
+### 3.2 使用uwsgi
+docker 使用方式及注意事项  
+* 插件默认监听容器的`6666`端口（uwsgi监听，需要与宿主机的`frps.ini`设置的插件端口匹配，可以使用`-p`映射到宿主机的任意端口）
+* 修改并配置自己的[config.py](https://github.com/zfb132/frp_info/blob/master/app/config.py)文件，可以使用`-v`映射到容器的`/frp/app/config.py`文件
+* 注意`config.py`中的文件路径是容器内的路径，不是宿主机的路径
+* 插件默认使用`uwsgi`作为web服务，可以使用`-v`映射自己的配置文件到容器的`/frp/uwsgi_frp-info.ini`文件来修改参数（**建议保持默认**）
+
+docker使用示例  
+```bash
+# -u 指定用户和组，否则容器内的文件权限可能有问题
+# -v 映射目录 -p 映射端口
+# 注意设置 config.py 的 SSH_IP_ALLOW="/frp/allow.txt"
+docker run -itd --restart always --name frp_info whuzfb/frp_info:uwsgi \
+ -u $(id -u):$(id -g) \
+ -v path/to/config.py:/frp/app/config.py \
+ -v path/to/allow.txt:/frp/allow.txt \
+ -p 15666:6666 \
+```
+需要修改什么文件都可以添加映射，容器内的`/frp`目录即为项目的根目录  
+下面是容器内项目结构  
+```txt
+/frp  
+├── allow.txt
+├── app
+│   ├── config.py
+│   ├── controller
+│   │   ├── __init__.py
+│   │   └── main.py
+│   ├── __init__.py
+│   └── model
+│       ├── DingTalkBot.py
+│       ├── HandleFrpMsg.py
+│       ├── __init__.py
+│       └── SSHFilter.py
+├── Dockerfile
+├── log.py
+├── requirements.txt
+├── restart.sh
+└── runserver.py
+```
+
+## 4. 本地手动运行
+### 4.1 创建虚拟环境
+插件基于python3编写，搭建flask服务（运行在虚拟环境），在当前项目主目录下创建虚拟环境并安装库：  
+```bash
+#! /bin/bash
+# 自动安装venv管理虚拟环境
+sudo apt-get install python3-venv -y
+# 创建虚拟环境venv
+python3 -m venv venv
+# 激活虚拟环境并安装库
+source venv/bin/activate && pip install  -r requirements.txt && deactivate
+```
+### 4.2 运行代码
 然后**在项目主目录下**输入以下命令测试启动uwsgi及插件frp-info：  
 `source venv/bin/activate && uwsgi --ini uwsgi_frp-info.ini -d /dev/null && deactivate`  
 此时可通过`cat ./log/frp-info.log`查看日志，或通过`lsof -i:6666`查看端口占用  
 最后重启frps服务`service frps restart`即可实现插件的安装配置
-## 3. 添加插件自启动
+### 4.3 添加插件自启动
 修改`frp-info.service`文件的uwsgi路径和配置文件路径为本机的路径，修改用户为本机的用户名  
 ```conf
 [Unit]
@@ -108,7 +168,7 @@ WantedBy=multi-user.target
 手动运行服务：`service frp-info start`  
 则所有配置完成，插件已正常工作，若重新启动系统，则`frps`和`frp-info`的service都会启动
 
-## 4. 服务管理的命令
+### 4.4 服务管理的命令
 重载服务后台（手动修改service文件后执行）：`sudo systemctl daemon-reload`  
 关闭服务：`service frp-info stop`  
 手动重启服务：`service frp-info restart`  
@@ -131,43 +191,26 @@ ubuntu@VM-16-13-ubuntu:~/$ systemctl status frp-info.service
 Jul 08 23:35:43 VM-16-13-ubuntu uwsgi[5040]: [pid: 5059|app: 0|req: 3/13] 127.0.0.1 () {34 vars in ...
 ubuntu@VM-16-13-ubuntu:~/$
 ```
+## 如何使用此插件限制frp的连接
+文件`app/config.py`中的主要内容和解释如下：  
+```python
+# no表示不过滤IP，允许所有的IP，此时忽略SSH_IP_BLOCK、SSH_IP_ALLOW
+# allow表示允许名单模式，只有SSH_IP_ALLOW允许访问，此时忽略SSH_IP_BLOCK
+# block表示禁止名单模式，只有SSH_IP_BLOCK禁止访问，此时忽略SSH_IP_ALLOW
+SSH_IP_MODE = 'no'
+# 每个IP都用字符串表示；支持子网掩码格式，如192.168.0.0/28
+# SSH_IP_ALLOW和SSH_IP_BLOCK可以写成list，也可写成文件的绝对路径
+# SSH_IP_ALLOW = ["202.114.12.11", "192.168.0.0/28"]
+# allow.txt文件内容示例（每个IP占一行，不需要引号）
+# 202.114.12.11
+# 192.168.0.0/28
+SSH_IP_ALLOW = "/home/zfb/frp-info/allow.txt"
+SSH_IP_BLOCK = []
+```
 ## 常见问题
-1. 如何修改服务监听端口（默认为`6666`）？  
+* 如何修改服务监听端口（默认为`6666`）？  
 修改`frps.ini`的`plugin.frp-info`部分的`addr`字段设置的端口；再修改`uwsgi_frp-info.ini`的`http`字段设置的端口，重新启动程序即可  
-2. 无法正常使用service管理？  
+* 无法正常使用service管理？  
 查看`/etc/systemd/system/frp-info.service`文件是否存在；确保User字段设置为本机用户名（防止权限问题），WorkingDirectory和ExecStart的路径与本机的路径一致  
-3. 只想查看frp的连接信息，不需要ip过滤功能？  
+* 只想查看frp的连接信息，不需要ip过滤功能？  
 建议使用[frp-notify](https://github.com/arugal/frp-notify)。事实上，我最初也是用的此插件，想要添加过滤一些IP的功能，但是由于对Go语言不熟悉，所以就自己动手写了一个使用Python的插件
-
-
-# docker 使用方式及注意事项
-1. docker使用时如果需要修改`uwsgi_frp-info.ini`文件可以设置映射如下  
-一定要记得修改里面的`home = ./venv`为：`#home = ./venv`，否则无法运行
-```
-docker run -dit --name frp --restart always -v you-path/uwsgi_frp-info.ini:/frp/uwsgi_frp-info.ini
-```
-
-需要修改什么文件就可以添加映射，容器内的`/frp`目录即为项目的根目录  
-下面是容器内项目结构  
-/frp  
-├── allow.txt  
-├── app  
-│   ├── config.py  
-│   ├── controller  
-│   │   ├── __init__.py  
-│   │   └── main.py  
-│   ├── __init__.py  
-│   └── model  
-│       ├── DingTalkBot.py  
-│       ├── HandleFrpMsg.py  
-│       ├── __init__.py  
-│       └── SSHFilter.py  
-├── Dockerfile  
-├── frp-info.service  
-├── LICENSE  
-├── log.py  
-├── README.md  
-├── requirements.txt  
-├── restart.sh  
-├── runserver.py  
-└── uwsgi_frp-info.ini  

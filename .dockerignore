@@ -1,0 +1,5 @@
+.github/
+.gitignore
+*.service
+*.md
+LICENSE

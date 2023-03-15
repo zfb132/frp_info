@@ -6,6 +6,7 @@
 from ipaddress import IPv4Network, ip_address
 import logging
 from app.config import SSH_IP_ALLOW, SSH_IP_BLOCK, SSH_IP_MODE
+import requests
 
 logging = logging.getLogger('runserver.sshfilter')
 
@@ -20,8 +21,12 @@ def get_ips(ips):
 
 # 根据ip返回地理位置和ISP
 def ip2geo(ip):
-    import requests
-    geo = requests.get("http://whois.pconline.com.cn/ip.jsp?ip={}".format(ip)).text
+    try:
+        geo = requests.get("http://whois.pconline.com.cn/ip.jsp?ip={}".format(ip)).text
+    except Exception as e:
+        print(repr(e))
+        logging.error(e)
+        geo = "未知"
     return geo.replace('\r','').replace('\n','')
 
 # 根据IP判断是否允许此用户连接
@@ -35,8 +40,14 @@ def ip_check(ip):
             return False
         # 判断允许名单是文件还是列表
         if not isinstance(SSH_IP_ALLOW, list):
-            with open(SSH_IP_ALLOW, "r") as file:
-                allow_list = file.read().splitlines()
+            try:
+                with open(SSH_IP_ALLOW, "r") as file:
+                    allow_list = file.read().splitlines()
+            except Exception as e:
+                print(f"Read {SSH_IP_ALLOW} error!")
+                print(repr(e))
+                logging.error(e)
+                exit(-1)
         else:
             allow_list = SSH_IP_ALLOW
         # 开始判断该IP是否在名单
@@ -61,8 +72,14 @@ def ip_check(ip):
             return True
         # 判断禁止名单是文件还是列表
         if not isinstance(SSH_IP_BLOCK, list):
-            with open(SSH_IP_BLOCK, "r") as file:
-                deny_list = file.read().splitlines()
+            try:
+                with open(SSH_IP_BLOCK, "r") as file:
+                    deny_list = file.read().splitlines()
+            except Exception as e:
+                print(f"Read {SSH_IP_BLOCK} error!")
+                print(repr(e))
+                logging.error(e)
+                exit(-1)
         else:
             deny_list = SSH_IP_BLOCK
         # 开始判断该IP是否在名单

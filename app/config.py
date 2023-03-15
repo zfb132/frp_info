@@ -11,6 +11,7 @@ AUTH_STR = "wqfK3JQ7Re2JngWpqtd2C542890tewkvslGDJVifvjFfindPf6xmdCGwYoJejhKwPfqq
 DINGTALK_SECRET_KEY = "SECff11ffffffffffffffffffffffffffff896c5cb6d21234567898765432123876"
 # 钉钉群机器人的接入秘钥
 DINGTALK_ACCESS_TOKEN = "896c5cb6d212896c5cb6d212ac9d9dac896c5cb6d2120dd24896c5cb6d2128c4"
+# 若机器人的任一秘钥为空，则不发送钉钉消息
 
 # frps.ini，若未设置，则写为""即可
 subdomain_host = "example.cn"
@@ -20,7 +21,7 @@ subdomain_host = "example.cn"
 # block表示禁止名单模式，只有SSH_IP_BLOCK禁止访问，此时忽略SSH_IP_ALLOW
 SSH_IP_MODE = 'no'
 # 每个IP都用字符串表示；支持子网掩码格式，如192.168.0.0/28
-# SSH_IP_ALLOW可以写成list，也可写成文件的绝对路径
+# SSH_IP_ALLOW和SSH_IP_BLOCK可以写成list，也可写成文件的绝对路径
 # SSH_IP_ALLOW = ["202.114.12.11", "192.168.0.0/28"]
 # allow.txt文件内容示例（每个IP占一行，不需要引号）
 # 202.114.12.11
