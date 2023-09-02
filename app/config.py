@@ -11,7 +11,13 @@ AUTH_STR = "wqfK3JQ7Re2JngWpqtd2C542890tewkvslGDJVifvjFfindPf6xmdCGwYoJejhKwPfqq
 DINGTALK_SECRET_KEY = "SECff11ffffffffffffffffffffffffffff896c5cb6d21234567898765432123876"
 # 钉钉群机器人的接入秘钥
 DINGTALK_ACCESS_TOKEN = "896c5cb6d212896c5cb6d212ac9d9dac896c5cb6d2120dd24896c5cb6d2128c4"
-# 若机器人的任一秘钥为空，则不发送钉钉消息
+# 飞书群机器人的webhook地址
+FEISHU_WEBHOOK = "https://open.feishu.cn/open-apis/bot/v2/hook/e4e2cc3f-5864-44b5-95c4-6adaa69d7a7b"
+# 飞书群机器人的安全密钥
+FEISHU_SECRET_KEY = "agPhgtfrdyhYfrTeWdQsX"
+# 多选项：dingtalk feishu
+RECEIVERS = ["dingtalk", "feishu"]
+# 若机器人的任一秘钥为空，则不发送消息
 
 # frps.ini，若未设置，则写为""即可
 subdomain_host = "example.cn"

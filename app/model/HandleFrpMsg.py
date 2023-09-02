@@ -7,8 +7,9 @@ from datetime import datetime
 import logging
 import time
 
-from app.config import SSH_IP_MODE, subdomain_host
-from app.model.DingTalkBot import send_text
+from app.config import SSH_IP_MODE, subdomain_host, RECEIVERS
+from app.model.DingTalkBot import send_text as send_text_dingtalk
+from app.model.FeishuBot import send_text as send_text_feishu
 from app.model.SSHFilter import ip_check, ip2geo
 
 logging = logging.getLogger('runserver.handlefrpmsg')
@@ -90,5 +91,9 @@ def handlemsg(data):
         # 基本不会出现此情况
         return True
     # 钉钉发送给管理员
-    send_text(txt)
+    for receiver in RECEIVERS:
+        if receiver == "dingtalk":
+            send_text_dingtalk(txt)
+        elif receiver == "feishu":
+            send_text_feishu(txt)
     return is_allow_ssh
