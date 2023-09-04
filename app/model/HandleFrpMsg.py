@@ -3,6 +3,7 @@
 # author: 'zfb'
 # time: 2020-07-08 19:55
 
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 import logging
 import time
@@ -13,6 +14,7 @@ from app.model.FeishuBot import send_text as send_text_feishu
 from app.model.SSHFilter import ip_check, ip2geo
 
 logging = logging.getLogger('runserver.handlefrpmsg')
+executor = ThreadPoolExecutor(4)
 
 # 格式化时间戳
 def timestamp_to_str(timestamp):
@@ -50,18 +52,30 @@ def newuserconn_operation(data):
         is_allow = True
     else:
         is_allow = ip_check(ip)
-    # 用户地理位置
-    position = ip2geo(ip)
-    str_fmt = "用户连接内网机器\n内网主机ID：{}\n代理名称：{}\n代理类型：{}\n登录时间：{}\n用户IP和端口：{}\n用户位置：{}\n允许用户连接：{}"
+    str_fmt = "用户连接内网机器\n内网主机ID：{}\n代理名称：{}\n代理类型：{}\n登录时间：{}\n用户IP和端口：{}"
     txt = str_fmt.format(
         run_id, data['proxy_name'], data['proxy_type'], timestamp_to_str(data['timestamp']), 
-        data['remote_addr'], position, is_allow
+        data['remote_addr']
     )
-    return txt, is_allow
+    return txt, ip, is_allow
 
 # 处理NewWorkConn操作
 def newworkconn_operation(data):
     pass
+
+def async_send(txt, is_allow_ssh=None, ip=None):
+    # 用户地理位置
+    if ip is not None:
+        position = ip2geo(ip)
+        txt += "\n用户地理位置：{}".format(position)
+    # 是否允许用户连接
+    if is_allow_ssh is not None:
+        txt += "\n允许连接：是" if is_allow_ssh else "\n允许连接：否"
+    for receiver in RECEIVERS:
+        if receiver == "dingtalk":
+            send_text_dingtalk(txt)
+        elif receiver == "feishu":
+            send_text_feishu(txt)
 
 # 处理frps的各种信息，包括以下几种
 # Login、NewProxy、Ping、NewUserConn、NewWorkConn
@@ -73,6 +87,7 @@ def handlemsg(data):
     logging.debug(content)
     # 发送给管理员用户的提示
     txt = ""
+    ip = None
     # 是否允许用户ssh连接
     is_allow_ssh = True
     # Ping操作每隔30s发送一次，不记录
@@ -84,16 +99,12 @@ def handlemsg(data):
         txt = newproxy_operation(content)
     elif operation == 'NewUserConn':
         content['timestamp'] = int(time.time())
-        txt, is_allow_ssh = newuserconn_operation(content)
+        txt, ip, is_allow_ssh = newuserconn_operation(content)
     elif operation == 'NewWorkConn':
         return True
     else:
         # 基本不会出现此情况
         return True
-    # 钉钉发送给管理员
-    for receiver in RECEIVERS:
-        if receiver == "dingtalk":
-            send_text_dingtalk(txt)
-        elif receiver == "feishu":
-            send_text_feishu(txt)
+    # 通知用户
+    executor.submit(async_send, txt, is_allow_ssh, ip)
     return is_allow_ssh

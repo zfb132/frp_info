@@ -30,7 +30,8 @@ def handler():
             response_data = {"reject": False, "unchange": True}
         else:
             # 拒绝连接，非法用户
-            response_data = {"reject": True, "reject_reason": "invalid user"}            
+            response_data = {"reject": True, "reject_reason": "invalid user"}
+        logging.debug(response_data)
         return json.dumps(response_data, ensure_ascii=False), 200
     except Exception as e:
         logging.error(repr(e))
