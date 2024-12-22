@@ -38,9 +38,11 @@ def newproxy_operation(data):
         run_id, data['proxy_name'], proxy_type
     )
     if proxy_type in ["tcp", "udp"]:
-        txt += "远程端口：{}\n".format(data['remote_port'])
+        if 'remote_port' in data:
+            txt += "远程端口：{}\n".format(data['remote_port'])
     elif proxy_type in ["http", "https"]:
-        txt += "子域名：{}.{}\n".format(data['subdomain'], subdomain_host)
+        if 'subdomain' in data:
+            txt += "子域名：{}.{}\n".format(data['subdomain'], subdomain_host)
     return txt
 
 # 处理NewUserConn操作：用户连接内网机器；用户（ssh）-->云服务器（frps）-->内网主机（frpc）
