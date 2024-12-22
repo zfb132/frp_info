@@ -13,9 +13,6 @@ import urllib.parse
 
 import app.config as config
 
-secret_key = config.DINGTALK_SECRET_KEY
-token = config.DINGTALK_ACCESS_TOKEN
-
 headers = {
     'Content-Type': 'application/json;charset=utf-8'
 }
@@ -32,6 +29,8 @@ def get_params(secret):
 
 # 发送消息并@指定成员
 def send_text(txt, number=""):
+    secret_key = config.DINGTALK_SECRET_KEY
+    token = config.DINGTALK_ACCESS_TOKEN
     # 判断是否有钉钉机器人的秘钥
     if not secret_key or not token:
         return

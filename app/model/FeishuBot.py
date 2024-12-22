@@ -13,9 +13,6 @@ import urllib.parse
 
 import app.config as config
 
-webhook_url = config.FEISHU_WEBHOOK
-token = config.FEISHU_SECRET_KEY
-
 headers = {
     'Content-Type': 'application/json;charset=utf-8'
 }
@@ -31,6 +28,8 @@ def get_params(secret):
 
 # 发送消息并@指定成员
 def send_text(txt):
+    webhook_url = config.FEISHU_WEBHOOK
+    token = config.FEISHU_SECRET_KEY
     # 判断是否有钉钉机器人的秘钥
     if not webhook_url or not token:
         return

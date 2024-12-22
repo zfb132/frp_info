@@ -80,11 +80,11 @@ docker使用示例
 # -u 指定用户和组，否则容器内的文件权限可能有问题
 # -v 映射目录 -p 映射端口
 # 注意设置 config.py 的 SSH_IP_ALLOW="/frp/allow.txt"
-docker run -itd --restart always --name frp_info whuzfb/frp_info:latest \
+docker run -itd --restart always --name frp_info \
  -u $(id -u):$(id -g) \
  -v path/to/config.py:/frp/app/config.py \
  -v path/to/allow.txt:/frp/allow.txt \
- -p 15666:6666 \
+ -p 15666:6666 whuzfb/frp_info:latest
 ```
 
 ### 3.2 使用uwsgi
@@ -99,11 +99,11 @@ docker使用示例
 # -u 指定用户和组，否则容器内的文件权限可能有问题
 # -v 映射目录 -p 映射端口
 # 注意设置 config.py 的 SSH_IP_ALLOW="/frp/allow.txt"
-docker run -itd --restart always --name frp_info whuzfb/frp_info:uwsgi \
+docker run -itd --restart always --name frp_info \
  -u $(id -u):$(id -g) \
  -v path/to/config.py:/frp/app/config.py \
  -v path/to/allow.txt:/frp/allow.txt \
- -p 15666:6666 \
+ -p 15666:6666 whuzfb/frp_info:uwsgi 
 ```
 需要修改什么文件都可以添加映射，容器内的`/frp`目录即为项目的根目录  
 下面是容器内项目结构  
