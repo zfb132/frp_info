@@ -22,10 +22,10 @@ def timestamp_to_str(timestamp):
 
 # 处理Login操作：frpc登录frps
 def login_operation(data):
-    str_fmt = "frp-client登录\nfrp版本：{}\n系统类型：{}\n系统架构：{}\n登录时间：{}\n连接池大小：{}"
+    str_fmt = "frp-client登录\nfrp版本：{}\n系统类型：{}\n系统架构：{}\n登录时间：{}\nIP端口：{}\n连接池大小：{}"
     txt = str_fmt.format(
         data['version'], data['os'],
-        data['arch'], timestamp_to_str(data['timestamp']), data['pool_count']
+        data['arch'], timestamp_to_str(data['timestamp']), data.get("client_address", "") ,data['pool_count']
     )
     return txt
 
@@ -34,15 +34,15 @@ def login_operation(data):
 def newproxy_operation(data):
     run_id = data['user']['run_id']
     proxy_type = data['proxy_type']
-    txt = "frp-client建立穿透代理\n主机ID：{}\n代理名称：{}\n代理类型：{}\n".format(
+    txt = "frp-client建立穿透代理\n主机ID：{}\n代理名称：{}\n代理类型：{}".format(
         run_id, data['proxy_name'], proxy_type
     )
     if proxy_type in ["tcp", "udp"]:
         if 'remote_port' in data:
-            txt += "远程端口：{}\n".format(data['remote_port'])
+            txt += "\n远程端口：{}".format(data['remote_port'])
     elif proxy_type in ["http", "https"]:
         if 'subdomain' in data:
-            txt += "子域名：{}.{}\n".format(data['subdomain'], subdomain_host)
+            txt += "\n子域名：{}.{}".format(data['subdomain'], subdomain_host)
     return txt
 
 # 处理NewUserConn操作：用户连接内网机器；用户（ssh）-->云服务器（frps）-->内网主机（frpc）
