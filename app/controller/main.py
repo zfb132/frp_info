@@ -38,12 +38,12 @@ def handler():
         return 404
 
 
-@app.route('/auth/fHfuglg_RpLHJBcXDZTYTDHG_ydyydYCYFCcxFFcgx_cJnbVBMjhDSweq_ryiutHG', methods=["GET"])
+@app.route(f'/auth/{config.AUTH_STR}', methods=["GET"])
 def auth():
     if request.method == "GET":
         logging.debug('GET访问AUTH')
         auth_str = request.args.get("token", type=str, default=None)
-        if auth_str == config.AUTH_STR:
+        if auth_str == config.AUTH_TOKEN:
             if not isinstance(config.SSH_IP_ALLOW, list):
                 ip = request.headers.get('X-Real-Ip', request.remote_addr)
                 with open(config.SSH_IP_ALLOW, "r+") as file:

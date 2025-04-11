@@ -5,8 +5,10 @@
 
 # flask秘钥
 FLASK_SECRET_KEY = "qrd762^$#&*hgwd$%UTD(*#RYD"
+# 验证URL
+AUTH_STR = "fHfuglg_RpLHJBcXDZTYTDHG_ydyydYCYFCcxFFcgx_cJnbVBMjhDSweq_ryiutHG"
 # 验证字符串，用以快速添加IP的允许名单
-AUTH_STR = "wqfK3JQ7Re2JngWpqtd2C542890tewkvslGDJVifvjFfindPf6xmdCGwYoJejhKwPfqqo"
+AUTH_TOKEN = "wqfK3JQ7Re2JngWpqtd2C542890tewkvslGDJVifvjFfindPf6xmdCGwYoJejhKwPfqqo"
 # 钉钉群机器人的安全密钥
 DINGTALK_SECRET_KEY = "SECff11ffffffffffffffffffffffffffff896c5cb6d21234567898765432123876"
 # 钉钉群机器人的接入秘钥

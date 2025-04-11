@@ -66,8 +66,8 @@ ops = Login,NewProxy,NewWorkConn,NewUserConn
 注意：`SSH_IP_ALLOW`如果设置为list，则无法在运行过程中自动载入新的ip；如果设置为文件名称，则可以实现动态的实时ip添加  
 只需要用户在本机使用GET访问链接（一般直接点击即可）  
 `http://12.34.56.78:6666/auth/fHfuglg_RpLHJBcXDZTYTDHG_ydyydYCYFCcxFFcgx_cJnbVBMjhDSweq_ryiutHG?token=wqfK3JQ7Re2JngWpqtd2C542890tewkvslGDJVifvjFfindPf6xmdCGwYoJejhKwPfqqo`  
-其中`12.34.56.78`是运行frps的主机IP，`6666`是本插件的监听端口，`token`的值是在`config.py`中配置的验证字符串`AUTH_STR`  
-为了减少被扫描的风险，最好自己修改`/auth/`后面的路径以及`AUTH_STR`的内容  
+其中`12.34.56.78`是运行frps的主机IP，`6666`是本插件的监听端口，`token`的值是在`config.py`中配置的验证字符串`AUTH_TOKEN`  
+为了减少被扫描的风险，最好自己修改`/auth/`后面的路径以及`AUTH_TOKEN`的内容  
 ## 3. 使用docker运行
 ### 3.1 不使用uwsgi
 docker 使用方式及注意事项  
