@@ -1,3 +1,5 @@
+
+
 # 插件说明和示例
 本代码运行在特定端口用于监听frp的RPC消息并进行处理，包括**通知用户frp连接信息和阻止特定IP段登录**的功能。
 * frp-client登录时（Login），插件会发送以下消息  
@@ -71,7 +73,7 @@ ops = Login,NewProxy,NewWorkConn,NewUserConn
 ## 3. 使用docker运行
 ### 3.1 不使用uwsgi
 docker 使用方式及注意事项  
-* 插件默认监听容器的`6666`端口（需要与宿主机的`frps.ini`设置的插件端口匹配，可以使用`-p`映射到宿主机的任意端口）
+* 插件默认监听容器的`6666`端口（`entrypoint.sh`脚本会强制固定容器端口为`6666`，因此 `-p` 映射时容器端口需保持为`6666`，以匹配宿主机的 `frps.ini`）
 * 修改并配置自己的[config.py](https://github.com/zfb132/frp_info/blob/master/app/config.py)文件，可以使用`-v`映射到容器的`/frp/app/config.py`文件
 * 注意`config.py`中的文件路径是容器内的路径，不是宿主机的路径
 
@@ -89,7 +91,7 @@ docker run -itd --restart always --name frp_info \
 
 ### 3.2 使用uwsgi
 docker 使用方式及注意事项  
-* 插件默认监听容器的`6666`端口（uwsgi监听，需要与宿主机的`frps.ini`设置的插件端口匹配，可以使用`-p`映射到宿主机的任意端口）
+* 插件默认监听容器的`6666`端口（`entrypoint.sh`脚本会强制固定容器端口为`6666`，因此 `-p` 映射时容器端口需保持为`6666`，以匹配宿主机的 `frps.ini`）
 * 修改并配置自己的[config.py](https://github.com/zfb132/frp_info/blob/master/app/config.py)文件，可以使用`-v`映射到容器的`/frp/app/config.py`文件
 * 注意`config.py`中的文件路径是容器内的路径，不是宿主机的路径
 * 插件默认使用`uwsgi`作为web服务，可以使用`-v`映射自己的配置文件到容器的`/frp/uwsgi_frp-info.ini`文件来修改参数（**建议保持默认**）
