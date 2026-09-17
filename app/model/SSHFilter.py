@@ -22,7 +22,12 @@ def get_ips(ips):
 # 根据ip返回地理位置和ISP
 def ip2geo(ip):
     try:
-        geo = requests.get("http://whois.pconline.com.cn/ip.jsp?ip={}".format(ip)).text
+        # fields=status,message,country,regionName,city,isp
+        resp = requests.get("http://ip-api.com/json/{}?lang=zh-CN&fields=49689".format(ip)).json()
+        if resp["status"] == "success":
+            geo = "{}-{}-{}\n{}".format(resp["country"], resp["regionName"], resp["city"], resp["isp"])
+        else:
+            geo = resp["message"]
     except Exception as e:
         print(repr(e))
         logging.error(e)
