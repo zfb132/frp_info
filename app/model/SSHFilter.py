@@ -3,7 +3,7 @@
 # author: 'zfb'
 # time: 2020-07-09 15:41
 
-from ipaddress import IPv4Network, ip_address
+from ipaddress import IPv4Network, ip_address, ip_network
 import logging
 from app.config import SSH_IP_ALLOW, SSH_IP_BLOCK, SSH_IP_MODE
 import requests
@@ -57,12 +57,12 @@ def ip_check(ip):
             allow_list = SSH_IP_ALLOW
         # 开始判断该IP是否在名单
         try:
-            ips = list(map(IPv4Network, allow_list))
+            ips = list(map(ip_network, allow_list))
         except Exception as e:
             # 可能会有子网掩码表示出错，则只保留单个ip
             print(repr(e))
             logging.error(e)
-            ips = [IPv4Network(x) for x in allow_list if '/' not in x]
+            ips = [ip_network(x) for x in allow_list if '/' not in x]
         # 判断IP是否在范围内
         for ip_range in ips:
             if ip in ip_range:
@@ -89,12 +89,12 @@ def ip_check(ip):
             deny_list = SSH_IP_BLOCK
         # 开始判断该IP是否在名单
         try:
-            ips = list(map(IPv4Network, deny_list))
+            ips = list(map(ip_network, deny_list))
         except Exception as e:
             # 可能会有子网掩码表示出错，则只保留单个ip
             print(repr(e))
             logging.error(e)
-            ips = [x for x in deny_list if '/' not in x]
+            ips = [ip_network(x) for x in deny_list if '/' not in x]
         # 判断IP是否在范围内
         for ip_range in ips:
             if ip in ip_range:

@@ -5,6 +5,8 @@
 
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
+from ipaddress import ip_address
+import os
 import logging
 import time
 
@@ -48,7 +50,13 @@ def newproxy_operation(data):
 # 处理NewUserConn操作：用户连接内网机器；用户（ssh）-->云服务器（frps）-->内网主机（frpc）
 def newuserconn_operation(data):
     run_id = data['user']['run_id']
-    ip = data['remote_addr'].split(':')[0]
+    # frps uses host:port for IPv4, and [host]:port for IPv6.
+    remote_addr = data['remote_addr']
+    if remote_addr.startswith('['):
+        ip = remote_addr[1:remote_addr.index(']')]
+    else:
+        ip = remote_addr.rsplit(':', 1)[0]
+    ip = str(ip_address(ip))
     # 是否允许连接
     if SSH_IP_MODE == 'no':
         is_allow = True
@@ -108,5 +116,11 @@ def handlemsg(data):
         # 基本不会出现此情况
         return True
     # 通知用户
-    executor.submit(async_send, txt, is_allow_ssh, ip)
+    # HTTP NewUserConn is emitted on authorization cache misses. Sending
+    # one geo-IP lookup and chat notification every few seconds per client
+    # would overload the original notification pipeline. Keep checks active.
+    is_http_admission = operation == 'NewUserConn' and content.get('proxy_type') == 'http'
+    notify_http = os.getenv('FRP_INFO_NOTIFY_HTTP_NEWUSERCONN', 'false').lower() in ('1', 'true', 'yes', 'on')
+    if not is_http_admission or notify_http:
+        executor.submit(async_send, txt, is_allow_ssh, ip)
     return is_allow_ssh
